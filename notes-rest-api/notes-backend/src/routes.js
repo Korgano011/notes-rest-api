@@ -20,11 +20,30 @@ noteRouter.post('/', async (req, res) => {
     try {
         const { title, content, notebookId } = req.body;
 
-        if(notebookId) {
-            try {
+        let validatedNotebookId = null;
+
+        if(!notebookId) {
+            console.info({
+                message: 'Notebook ID not provided. Storing note without notebook.'
+            });
+        } else if (!mongoose.Types.ObjectId.isValid(notebookId)) {
+            return res.status(400).json({ error: 'Notebook not found', notebookId });
+        } else {
+                try {
             await axios.get(`${notebooksApiUrl}/${notebookId}`);
+            
         } catch (err) {
-            console.error(err);
+            const jsonError = err.toJSON();
+
+            if (jsonError.status === 404) {
+                return res.status(400).json({ error: 'Notebook not found', notebookId });
+            } else {
+                console.error({
+                    message: 'Error verifying the notebook ID. Upstream notebooks service not available. Storing note with provided ID for later validation.', notebookId, error: err.message,
+                });
+            }
+        } finally {
+            validatedNotebookId = notebookId;
         }
         }
 
@@ -32,7 +51,7 @@ noteRouter.post('/', async (req, res) => {
             return res.status(400).json({ error: "'title' 'content' fields are required."});
         }
 
-        const note = new Note({ title, content });
+        const note = new Note({ title, content, notebookId: validatedNotebookId });
         await note.save();
         res.status(201).json({ data: note });
     } catch (err) {
