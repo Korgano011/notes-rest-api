@@ -5,3 +5,22 @@ docker history notes-backend:dev
 docker build -t notes-backend:prod --target=production .
 
 docker history notes-backend:prod
+
+/*
+const A = (req, res, next) => {
+    Some validation...
+
+    next();
+    }
+const B = (req, res, next) => {
+    Some business logic
+
+    next(err);
+    }
+const C = (errors, req, res, next) => {
+    Some error processing
+    }
+notebookRouter.post('/', A, B, C);
+*/
+
+npm i --save-exact axios@1.7.2

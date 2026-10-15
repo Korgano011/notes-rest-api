@@ -16,7 +16,7 @@ services:
           path: ./src
           target: /app/src
     networks:
-      - notes-net
+      - notes-app-net
     depends_on:
       - notes-db
   notes-db:
@@ -32,10 +32,10 @@ services:
         target: /docker-entrypoint-initdb.d/mongo-init.js
         read_only: true
     networks:
-     - notes-net
+     - notes-app-net
 
 volumes:
   notes-data:
 
 networks:
-  notes-net:
+  notes-app-net:
